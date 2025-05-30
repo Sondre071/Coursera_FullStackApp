@@ -1,5 +1,5 @@
 @page "/fetchproducts"
-@inject HttpClient Http
+@inject HttpClient httpClient
 
 <h3>Product List</h3>
 
@@ -36,21 +36,32 @@
         try
         {
             // Attempt to get the products
-            var response = await HttpClient.GetAsync("api/productlist");
+            var response = await httpClient.GetAsync("api/productlist");
+
             response.EnsureSuccessStatusCode();
+
             var json = await response.Content.ReadAsStringAsync();
-            products = JsonSerializer.Deserialize<Product[]>(json);
-            //products = await Http.GetFromJsonAsync<Product[]>("http://localhost:5127/api/productList");
+
+            // Reduce errors by allowing different casings.
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+            products = JsonSerializer.Deserialize<Product[]>(json, options) ?? Array.Empty<Product>();
         }
+
+        // Handles errors in fetching data
         catch (HttpRequestException ex)
         {
-            errorMessage = $"Could not fetch products: {ex.Message}";
-            products = null;
+            Console.Error.WriteLine(ex);
+            errorMessage = "Could not fetch products. Please try again later.";
+            products = Array.Empty<Product>();
         }
+
+        // Handles any other errors.
         catch (Exception ex)
         {
-            errorMessage = $"Unexpected error: {ex.Message}";
-            products = null;
+            Console.Error.WriteLine(ex);
+            errorMessage = "Unexpected error occurred.";
+            products = Array.Empty<Product>();
         }
         finally
         {
