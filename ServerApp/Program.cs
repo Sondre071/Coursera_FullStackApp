@@ -15,7 +15,7 @@ var app = builder.Build();
 
 app.UseCors();
 
-app.MapGet("/api/products", () =>
+app.MapGet("/api/productList", () =>
 
 {
 

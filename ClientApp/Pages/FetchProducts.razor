@@ -36,7 +36,11 @@
         try
         {
             // Attempt to get the products
-            products = await Http.GetFromJsonAsync<Product[]>("http://localhost:5127/api/products");
+            var response = await HttpClient.GetAsync("api/productlist");
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+            products = JsonSerializer.Deserialize<Product[]>(json);
+            //products = await Http.GetFromJsonAsync<Product[]>("http://localhost:5127/api/productList");
         }
         catch (HttpRequestException ex)
         {
