@@ -1,5 +1,5 @@
 @page "/fetchproducts"
-@inject HttpClient httpClient
+@using System.Text.Json
 
 <h3>Product List</h3>
 
@@ -12,11 +12,14 @@
     {
         <li style="color:red">@errorMessage</li>
     }
-    else if (products != null && products.Length > 0)
+    else if (products is not null && products.Length > 0)
     {
         foreach (var product in products)
         {
-            <li>@product.Name - $@product.Price</li>
+            <li>
+                <span>@product.Name - $@product.Price</span>
+                <p>Stock: @product.Stock</p>
+            </li>
         }
     }
     else
@@ -35,8 +38,9 @@
     {
         try
         {
-            // Attempt to get the products
-            var response = await httpClient.GetAsync("api/productlist");
+            // I could not get the urls to work, had to make a new client.
+            var client = new HttpClient();
+            var response = await client.GetAsync("http://localhost:5127/api/productList");
 
             response.EnsureSuccessStatusCode();
 
